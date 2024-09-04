@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-storage.js"></script>
+    <title>Contact Form</title>
+    <link rel="stylesheet" href="contact.css" />
+    <script
+      src="https://kit.fontawesome.com/64d58efce2.js"
+      crossorigin="anonymous"
+    ></script>
+    <style>
+      .cart img{
+        height: 35px;
+        width: 35px;
+        margin-right: 80px;
+      }
+    </style>
+  </head>
+  <body>
+
+    <nav>
+
+       <!-- <div class="logo">
+       <h3>Tech<span>Emporium</span></h3>
+      </div> -->
+
+      <div class="LOGO">
+        <h2>Tech</h2>
+        <span style="--i:1">E</span>
+        <span style="--i:2">M</span>
+        <span style="--i:3">P</span>
+        <span style="--i:4">O</span>
+        <span style="--i:5">R</span>
+        <span style="--i:6">I</span>
+        <span style="--i:7">U</span>
+        <span style="--i:8">M</span>
+       </div>
+
+       <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="Laptop-User.html" class="nav-link">Laptops</a>
+        <li><a href="Pc-User.html" class="nav-link">PC</a>
+          <li><a href="User-Custom.html" class="nav-link">Custom-PC</a>
+        <li><a href="about.html" class="nav-link">About Us</a></li>
+        <li><a href="contact.html" class="nav-link">Contact Us</a></li>
+      </ul>
+      <div class="cart">
+        <a href="cart.html"><img src="kindpng_4803687.png" alt="error loading"></a>
+       </div>
+    </nav>
+    
+
+<!-- Contact form=========== -->
+
+<div class="container">
+  <h1 class="brand">Get In Touch With Us</h1>
+  <div class="wrapper">
+    <div class="company-info">
+     
+     
+    </div>
+    <div class="contact">
+      <h3>Email Us</h3>
+      <div class="alert">Your message has been sent</div>
+      <form id="contactForm">
+        <p>
+          <label>Name</label>
+          <input type="text" name="name" id="name" required>
+        </p>
+        <p>
+          <label>Company</label>
+          <input type="text" name="company" id="company">
+        </p>
+        <p>
+          <label>Email Address</label>
+          <input type="email" name="email" id="email" required>
+        </p>
+        <p>
+          <label>Phone Number</label>
+          <input type="text" name="phone" id="phone">
+        </p>
+        <p class="full">
+          <label>Message</label>
+          <textarea name="message" rows="5" id="message"></textarea>
+        </p>
+        <p class="full">
+          <button type="submit">Submit</button>
+        </p>
+      </form>
+    </div>
+  </div>
+</div>
+
+    <!-- contact-form ends here========================= -->
+  
+
+    <script src="contact.js"></script>
+  </body>
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <p>&copy; 2023 TechEmporium. All rights reserved.</p>
+        </div>
+        <div class="col-md-6">
+          <nav>
+            <ul class="list-unstyled">
+              <li><a href="#">Privacy Policy</a></li>
+              <li><a href="#">Terms of Use</a></li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <p>123 Main Street, Baroda,Gujarat,INDIA | Phone: (123) 456-7890 | Email: info@TechEmporium.com</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+</html>

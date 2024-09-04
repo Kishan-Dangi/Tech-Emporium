@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-database.js"></script>
+    <title>Customer Responses</title>
+    <style>
+        /* Add your CSS styles here */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        button {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            margin: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Customer Responses</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Company</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Message</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="table-body">
+            <!-- Table data will be inserted here using JavaScript -->
+        </tbody>
+    </table>
+
+    <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDrRU7QuBc0TFG_Ks5hNUgAMPAReps1giU",
+            authDomain: "tech-emporium.firebaseapp.com",
+            databaseURL: "https://tech-emporium-default-rtdb.firebaseio.com",
+            projectId: "tech-emporium",
+            storageBucket: "tech-emporium.appspot.com",
+            messagingSenderId: "567746946369",
+            appId: "1:567746946369:web:b3ae388079981d4422edc0",
+            measurementId: "G-YQNCSRVK9F"
+
+            // Add your Firebase config here
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        // Reference messages collection
+        const messagesRef = firebase.database().ref('messages');
+
+        // Delete message from Firebase
+        function deleteMessage(key) {
+            messagesRef.child(key).remove();
+        }
+
+        // Display messages from Firebase
+        messagesRef.on('value', (snapshot) => {
+            const tableBody = document.getElementById('table-body');
+            tableBody.innerHTML = '';
+            snapshot.forEach((childSnapshot) => {
+                const key = childSnapshot.key;
+                const childData = childSnapshot.val();
+                const { name, company, email, phone, message } = childData;
+                const row = `
+          <tr>
+            <td>${name}</td>
+            <td>${company}</td>
+            <td>${email}</td>
+            <td>${phone}</td>
+           <td>${message}</td>
+            <td><button onclick="deleteMessage('${key}')">Delete</button></td>
+          </tr>
+      `;
+                tableBody.innerHTML += row;
+            });
+        });
+    </script>
+</body>
+
+</html>

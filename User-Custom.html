@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>User Page</title>
+  <link rel="stylesheet" type="text/css" href="user.css">
+  <script src="https://www.gstatic.com/firebasejs/8.8.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.8.0/firebase-database.js"></script>
+  <link rel="stylesheet" href="User-Custom.css">
+
+</head>
+
+<body>
+  <script> var firebaseConfig = {
+      apiKey: "AIzaSyDrRU7QuBc0TFG_Ks5hNUgAMPAReps1giU",
+      authDomain: "tech-emporium.firebaseapp.com",
+      databaseURL: "https://tech-emporium-default-rtdb.firebaseio.com",
+      projectId: "tech-emporium",
+      storageBucket: "tech-emporium.appspot.com",
+      messagingSenderId: "567746946369",
+      appId: "1:567746946369:web:b3ae388079981d4422edc0",
+      measurementId: "G-YQNCSRVK9F"
+    };
+  </script>
+  <h1>Add Components to Cart</h1>
+  <form id="componentForm">
+    <label for="componentType">Component Type:</label>
+    <select id="componentType" required>
+      <option value="">Select Component Type</option>
+    </select>
+
+    <label for="component">Component:</label>
+    <select id="component" required>
+      <option value="">Select Component</option>
+    </select>
+
+    <button type="submit">Add Component</button>
+  </form>
+
+  <div id="selectedComponents" class="selected-components">
+    <h2>Selected Components:</h2>
+
+
+    <div id="totalPrice" class="total-price">Total Price: ₹0.00</div>
+
+    <button id="addToCartButton" onclick="addToCart()">Add to Cart</button>
+  </div>
+  <script>
+
+    firebase.initializeApp(firebaseConfig);
+
+    const db = firebase.database();
+
+    function getComponents() {
+      return db.ref('components').once('value').then((snapshot) => {
+        return snapshot.val();
+      });
+    }
+
+    function renderComponentTypes(componentTypes) {
+      const componentTypeSelect = document.getElementById('componentType');
+
+      componentTypeSelect.innerHTML = '';
+
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'Select Component Type';
+      componentTypeSelect.appendChild(defaultOption);
+
+      for (const componentType in componentTypes) {
+        const option = document.createElement('option');
+        option.value = componentType;
+        option.textContent = componentType;
+        componentTypeSelect.appendChild(option);
+      }
+    }
+
+    function renderComponents(componentType, components) {
+      const componentSelect = document.getElementById('component');
+
+      componentSelect.innerHTML = '';
+
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'Select Component';
+      componentSelect.appendChild(defaultOption);
+
+      for (const componentId in components[componentType]) {
+        const component = components[componentType][componentId];
+        const option = document.createElement('option');
+        option.value = componentId;
+        option.textContent = component.name;
+        option.setAttribute('data-price', component.price); // Add data-price attribute
+        componentSelect.appendChild(option);
+      }
+    }
+
+    document.getElementById('componentType').addEventListener('change', (e) => {
+      const componentType = e.target.value;
+      const componentsRef = db.ref('components');
+
+      if (componentType !== '') {
+        componentsRef.once('value', (snapshot) => {
+          const componentData = snapshot.val();
+          renderComponents(componentType, componentData);
+
+        });
+      }
+    });
+
+    document.getElementById('componentForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const componentId = document.getElementById('component').value;
+      const componentType = document.getElementById('componentType').value;
+      const componentRef = db.ref(`components/${componentType}/${componentId}`);
+
+      componentRef.once('value', (snapshot) => {
+        const componentData = snapshot.val();
+        const totalPriceElement = document.getElementById('totalPrice');
+        const selectedComponents = document.getElementById('selectedComponents');
+
+        const componentItem = document.createElement('div');
+        componentItem.className = 'component-item';
+        componentItem.setAttribute('data-price', componentData.price);
+
+        const componentName = document.createElement('span');
+        componentName.textContent = componentData.name;
+
+        const componentPrice = document.createElement('span');
+        componentPrice.className = 'component-price';
+        componentPrice.textContent = `₹${componentData.price.toFixed(2)}`;
+
+        componentItem.appendChild(componentName);
+        componentItem.appendChild(componentPrice);
+
+        selectedComponents.appendChild(componentItem);
+
+        const componentItems = selectedComponents.getElementsByClassName('component-item');
+        const totalPrice = calculateTotalPrice(componentItems);
+
+        totalPriceElement.textContent = `Total Price: ₹${totalPrice}`;
+      });
+
+      // Reset the form
+      document.getElementById('componentType').selectedIndex = 0;
+      document.getElementById('component').innerHTML = '<option value="">Select Component</option>';
+    });
+
+    function calculateTotalPrice(componentItems) {
+      let totalPrice = 0;
+
+      for (let i = 0; i < componentItems.length; i++) {
+        const componentItem = componentItems[i];
+        const componentPrice = parseFloat(componentItem.getAttribute('data-price'));
+        if (!isNaN(componentPrice)) {
+          totalPrice += componentPrice;
+        }
+      }
+
+      return totalPrice.toFixed(2);
+    }
+
+    function addToCart() {
+      const selectedComponents = document.getElementsByClassName('component-item');
+      const cartRef = db.ref('Cart');
+
+      const cartItem = {
+        components: []
+      };
+
+      for (let i = 0; i < selectedComponents.length; i++) {
+        const componentItem = selectedComponents[i];
+        const componentName = componentItem.getElementsByTagName('span')[0].textContent;
+        const componentPrice = parseFloat(componentItem.getAttribute('data-price'));
+
+        cartItem.components.push({
+          name: componentName,
+          price: componentPrice
+        });
+      }
+
+      const cartItemRef = cartRef.push();
+      cartItemRef.set(cartItem);
+
+      // Clear selected components and total price
+      const selectedComponentsContainer = document.getElementById('selectedComponents');
+      selectedComponentsContainer.innerHTML = '';
+      document.getElementById('totalPrice').textContent = 'Total Price: ₹0.00';
+
+      alert('Components added to cart!');
+    }
+
+    // Retrieve and render the component types when the page loads
+    getComponents().then((components) => {
+      renderComponentTypes(components);
+    });
+  </script>
+  <section>
+
+    <body onload="displayCart()">
+      <div class="cart-container">
+        <h1>Cart</h1>
+        <table>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Total</th>
+              <th>Remove</th>
+            </tr>
+          </thead>
+          <tbody id="cart-items">
+          </tbody>
+        </table>
+        <div class="cart-total">
+          <h3>Total: <span id="total-price"></span></h3>
+          <button onclick="showCheckout()">Checkout</button>
+        </div>
+      </div>
+
+      <div id="checkout-form" style="display:none;">
+        <form onsubmit="submitCheckout(event)">
+          <h2>Checkout Details</h2>
+          <label for="name">Name:</label>
+          <input type="text" id="name" name="name" required><br>
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" required><br>
+          <label for="phone">Contact</label>
+          <input type="tel" id="phone" name="phone" required><br>
+          <label for="address">Address:</label>
+          <textarea id="address" name="address" required></textarea><br>
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+
+      <script>
+        // Initialize Firebase
+
+        firebase.initializeApp(firebaseConfig);
+        var storage = firebase.storage();
+
+        // Get a reference to the storage service 
+        var storageRef = storage.ref();
+
+
+        function displayCart() {
+          console.log("displayCart() function called");
+          var cartItems = document.getElementById("cart-items");
+          var total = 0;
+          var dbRef = firebase.database().ref("Cart");
+          dbRef.once("value", function (snapshot) {
+            snapshot.forEach(function (childSnapshot) {
+              var key = childSnapshot.key;
+              var componentsRef = childSnapshot.child("components");
+              var quantity = componentsRef.numChildren(); // Calculate the quantity based on the number of child nodes
+              var item = {
+                name: "", // Update the name and price based on your database structure
+                price: 0
+              };
+              componentsRef.forEach(function (componentSnapshot) {
+                var component = componentSnapshot.val();
+                item.name += component.name + ", "; // Append the component name
+                item.price += component.price; // Accumulate the component price
+              });
+              item.name = item.name.slice(0, -2); // Remove the trailing comma and space
+              var row = document.createElement("tr");
+              row.innerHTML = "<td>" + item.name + "</td>" +
+                "<td>₹" + item.price + "</td>" +
+                "<td>" + 1 + "</td>" + // Use a quantity of 1 for each component
+                "<td>₹" + item.price * 1 + "</td>" + // Calculate the total based on quantity
+                '<td><button onclick="removeItem(\'' + key + '\')">Remove</button></td>';
+              cartItems.appendChild(row);
+              total += item.price * 1; // Accumulate the total based on quantity
+            });
+            document.getElementById("total-price").innerHTML = "₹" + total;
+          });
+        }
+
+
+
+        function removeItem(key) {
+          firebase.database().ref("Cart/" + key).remove();
+          alert("Item removed from cart");
+          window.location.reload();
+        }
+
+        function showCheckout() {
+          document.getElementById("checkout-form").style.display = "block";
+        }
+
+
+        function submitCheckout(event) {
+          event.preventDefault();
+          var name = document.getElementById("name").value;
+          var email = document.getElementById("email").value;
+          var phone = document.getElementById("phone").value;
+          var address = document.getElementById("address").value;
+
+          var cartItems = document.getElementById("cart-items");
+          var products = [];
+          var total = 0;
+
+          // Iterate over the cart items and retrieve product details
+          var rows = cartItems.getElementsByTagName("tr");
+          for (var i = 0; i < rows.length; i++) {
+            var row = rows[i];
+            var cells = row.getElementsByTagName("td");
+
+            var productName = cells[0].innerText;
+            var price = parseInt(cells[1].innerText.replace("₹", ""));
+            var quantity = parseInt(cells[2].innerText);
+
+            products.push({
+              name: productName,
+              price: price,
+              quantity: quantity
+            });
+
+            total += price * quantity;
+          }
+
+          var dbRef = firebase.database().ref();
+          var ordersRef = dbRef.child("Orders/");
+
+          // Get the current date and timestamp
+          var currentDate = new Date();
+          var timestamp = currentDate.getTime();
+
+          // Generate a unique order ID
+          var orderId = generateOrderId();
+
+          // Push the order details to the "Orders" node with date, timestamp, and order ID
+          ordersRef.push({
+            orderid: orderId,
+            name: name,
+            email: email,
+            phone: phone,
+            address: address,
+            products: products,
+            total: total,
+            date: currentDate.toString(),
+            timestamp: timestamp
+          });
+
+          // Remove cart items from the Firebase Realtime Database
+          var cartRef = dbRef.child("Cart");
+          cartRef.remove()
+            .then(function () {
+              alert("Thank you for your purchase!");
+              window.location.href = "payment-1000rs.html";
+            })
+            .catch(function (error) {
+              console.log("Error removing cart items:", error);
+            });
+        }
+
+        // Function to generate a random order ID
+        function generateOrderId() {
+          var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+          var orderId = "";
+          for (var i = 0; i < 8; i++) {
+            var randomIndex = Math.floor(Math.random() * chars.length);
+            orderId += chars.charAt(randomIndex);
+          }
+          return orderId;
+        }
+
+
+      </script>
+  </section>
+</body>
+
+</html>

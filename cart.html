@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Cart</title>
+    <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-storage.js"></script>
+    <style>body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background-color: #f3f3f3;
+      }
+      
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #333;
+        color: #fff;
+        padding: 10px;
+      }
+      
+      nav h2 {
+        margin: 0;
+        font-size: 28px;
+      }
+      
+      nav ul {
+        display: flex;
+        list-style: none;
+        margin: 0;
+      }
+      
+      nav ul li {
+        margin-right: 25px;
+      }
+      
+      nav ul li a {
+        color: #fff;
+        text-decoration: none;
+        font-size: 18px;
+      }
+      
+      .cart-container {
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      }
+      
+      .cart-container h1 {
+        margin-top: 0;
+      }
+      
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+      
+      table tr:nth-child(even) {
+        background-color: #f2f2f2;
+      }
+      
+      table th {
+        background-color: #333;
+        color:#fff;
+        padding: 10px;
+        text-align: left;
+      }
+      
+      table td {
+        padding: 10px;
+      }
+      
+      .cart-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      
+      .cart-total h3 {
+        margin: 0;
+      }
+      
+      .cart-total button {
+        background-color: #333;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      
+      .cart-total button:hover {
+        background-color: #444;
+      }
+      form {
+  max-width: 500px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+form h2 {
+  margin-top: 0;
+  font-size: 24px;
+}
+
+form label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+form input,
+form textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: none;
+  border-radius: 4px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+form button[type="submit"] {
+  background-color: #333;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+form button[type="submit"]:hover {
+  background-color: #444;
+}
+      
+      @media (max-width: 768px) {
+        nav {
+          flex-direction: column;
+          text-align: center;
+        }
+      
+        nav ul {
+          margin-top: 10px;
+          justify-content: center;
+        }
+      
+        nav ul li {
+          margin-right: 0;
+          margin-bottom: 10px;
+        }
+      }</style>
+</head>
+
+<body onload="displayCart()">
+    <div class="cart-container">
+        <h1>Cart</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                    <th>Remove</th>
+                </tr>
+            </thead>
+            <tbody id="cart-items">
+            </tbody>
+        </table>
+        <div class="cart-total">
+            <h3>Total: <span id="total-price"></span></h3>
+            <button onclick="showCheckout()">Checkout</button>
+        </div>
+    </div>
+
+    <div id="checkout-form" style="display:none;">
+        <form onsubmit="submitCheckout(event)">
+            <h2>Checkout Details</h2>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required><br>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required><br>
+            <label for="phone">Contact</label>
+            <input type="tel" id="phone" name="phone" required><br>
+            <label for="address">Address:</label>
+            <textarea id="address" name="address" required></textarea><br>
+            <button type="submit">Submit</button>
+            </form>
+    </div>
+
+    <script>
+        // Initialize Firebase
+        var firebaseConfig = {
+            apiKey: "AIzaSyDrRU7QuBc0TFG_Ks5hNUgAMPAReps1giU",
+            authDomain: "tech-emporium.firebaseapp.com",
+            databaseURL: "https://tech-emporium-default-rtdb.firebaseio.com",
+            projectId: "tech-emporium",
+            storageBucket: "tech-emporium.appspot.com",
+            messagingSenderId: "567746946369",
+            appId: "1:567746946369:web:b3ae388079981d4422edc0",
+            measurementId: "G-YQNCSRVK9F"
+        };
+        firebase.initializeApp(firebaseConfig);
+        var storage = firebase.storage();
+
+        // Get a reference to the storage service 
+        var storageRef = storage.ref();
+
+        function displayCart() {
+            console.log("displayCart() function called");
+            var cartItems = document.getElementById("cart-items");
+            var total = 0;
+            var dbRef = firebase.database().ref().child("Cart");
+            dbRef.on("child_added", function (snap) {
+                var item = snap.val();
+                var row = document.createElement("tr");
+                row.innerHTML = "<td>" + item.name + "</td>" +
+                    "<td>₹" + item.price + "</td>" +
+                    "<td>" + item.quantity + "</td>" +
+                    "<td>₹" + item.price * item.quantity + "</td>" +
+                    '<td><button onclick="removeItem(\'' + snap.key + '\')">Remove</button></td>';
+                cartItems.appendChild(row);
+                total += item.price * item.quantity;
+                document.getElementById("total-price").innerHTML = "₹" + total;
+            });
+        }
+
+        function removeItem(key) {
+            firebase.database().ref("Cart/" + key).remove();
+            alert("Item removed from cart");
+            window.location.reload();
+        }
+
+        function showCheckout() {
+            document.getElementById("checkout-form").style.display = "block";
+        }
+
+
+function submitCheckout(event) {
+    event.preventDefault();
+    var name = document.getElementById("name").value;
+    var email = document.getElementById("email").value;
+    var phone = document.getElementById("phone").value;
+    var address = document.getElementById("address").value;
+
+    var cartItems = document.getElementById("cart-items");
+    var products = [];
+    var total = 0;
+
+    // Iterate over the cart items and retrieve product details
+    var rows = cartItems.getElementsByTagName("tr");
+    for (var i = 0; i < rows.length; i++) {
+        var row = rows[i];
+        var cells = row.getElementsByTagName("td");
+
+        var productName = cells[0].innerText;
+        var price = parseInt(cells[1].innerText.replace("₹", ""));
+        var quantity = parseInt(cells[2].innerText);
+
+        products.push({
+            name: productName,
+            price: price,
+            quantity: quantity
+        });
+
+        total += price * quantity;
+    }
+
+    var dbRef = firebase.database().ref();
+    var ordersRef = dbRef.child("Orders");
+
+    // Get the current date and timestamp
+    var currentDate = new Date();
+    var timestamp = currentDate.getTime();
+
+    // Generate a unique order ID
+    var orderId = generateOrderId();
+
+    // Push the order details to the "Orders" node with date, timestamp, and order ID
+    ordersRef.push({
+        orderid: orderId,
+        name: name,
+        email: email,
+        phone: phone,
+        address: address,
+        products: products,
+        total: total,
+        date: currentDate.toString(),
+        timestamp: timestamp
+    });
+
+    // Remove cart items from the Firebase Realtime Database
+    var cartRef = dbRef.child("Cart");
+    cartRef.remove()
+        .then(function () {
+            alert("Thank you for your purchase!");
+            window.location.href = "payment-1000rs.html";
+        })
+        .catch(function (error) {
+            console.log("Error removing cart items:", error);
+        });
+}
+
+// Function to generate a random order ID
+function generateOrderId() {
+    var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    var orderId = "";
+    for (var i = 0; i < 8; i++) {
+        var randomIndex = Math.floor(Math.random() * chars.length);
+        orderId += chars.charAt(randomIndex);
+    }
+    return orderId;
+}
+
+
+    </script>
+</body>
+
+</html>

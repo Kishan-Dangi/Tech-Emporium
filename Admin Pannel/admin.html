@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Admin</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+	<h1>Admin</h1>
+	<button id="logout-button" type="button">Logout</button>
+
+<script>
+    // add event listener to the logout button
+    document.getElementById("logout-button").addEventListener("click", function(event) {
+        event.preventDefault(); // prevent default button behavior
+
+        // call the logout function
+        logout();
+    });
+
+    // logout function
+    function logout() {
+        // add logout code here, e.g. clearing session storage or cookies
+        // redirect to the login page
+        window.location.href = "login.html";
+    }
+</script>
+	<div class="card-container">
+		<div class="card">
+			<a href="Desktop-Admin.html"><img src="icon/home.png" alt="Card Image"></a>
+			<div class="card-content">
+				<h2>Home Screen</h2>
+				<p>Add content to Home Screen</p>
+			</div>
+		</div>
+		<div class="card">
+			<a href="Laptop-Admin.html"><img src="icon/laptop.png" alt="Card Image"></a>
+			<div class="card-content">
+				<h2>Add Laptop</h2>
+				<p>Add content to Laptop Screen.</p>
+			</div>
+		</div>
+		<div class="card">
+			<a href="Pc-Admin.html"><img src="icon/computer.png" alt="Card Image"></a>
+			<div class="card-content">
+				<h2>Add Pc</h2>
+				<p>Add content to Pc Screen</p>
+			</div>
+		</div>
+		<div class="card">
+			<a href="Admin-Custom.html"><img src="icon/repairing-service.png" alt="Card Image"></a>
+			<div class="card-content">
+				<h2>Add Custom-Items</h2>
+				<p>Add content to Home Screen</p>
+			</div>
+		</div>
+		<div class="card">
+			<a href="retrive-Admin.html"><img src="icon/email.png" alt="Card Image"></a>
+			<div class="card-content">
+				<h2>Who Messeged Us?</h2>
+				<p>Can see customer Messages Here </p>
+			</div>
+		</div>
+		<div class="card">
+			<a href="orders.html"><img src="icon/order-placed-purchased-icon.png" alt="Card Image"></a>
+			<div class="card-content">
+				<h2>Orders</h2>
+				<p>View Orders</p>
+			</div>
+		</div>
+	</div>
+	
+</body>
+
+</html>

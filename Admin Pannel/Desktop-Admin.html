@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Admin Panel</title>
+    <style>
+        input[type=text],
+        input[type=file],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            margin-top: 6px;
+            margin-bottom: 16px;
+            resize: vertical;
+        }
+
+        input[type=submit] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        input[type=submit]:hover {
+            background-color: #45a049;
+        }
+
+        .container {
+            border-radius: 5px;
+            background-color: #f2f2f2;
+            padding: 20px;
+            margin-top: 50px;
+            margin-bottom: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Add Product to homescreen</h2>
+        <form id="product-form">
+            <label for="name"></label>Product Name:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="price">Price:</label>
+            <input type="text" id="price" name="price" required>
+
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" required></textarea>
+
+            <label for="image">Image:</label>
+            <input type="file" id="image" name="image" required>
+
+            <input type="submit" value="Add Product">
+        </form>
+
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-database.js"></script>
+    <script>
+
+
+        // Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyDrRU7QuBc0TFG_Ks5hNUgAMPAReps1giU",
+            authDomain: "tech-emporium.firebaseapp.com",
+            databaseURL: "https://tech-emporium-default-rtdb.firebaseio.com",
+            projectId: "tech-emporium",
+            storageBucket: "tech-emporium.appspot.com",
+            messagingSenderId: "567746946369",
+            appId: "1:567746946369:web:b3ae388079981d4422edc0",
+            measurementId: "G-YQNCSRVK9F"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Get a reference to the database service
+        var database = firebase.database();
+        var storage = firebase.storage()
+
+        // //////////////////////////// by me
+        // Handle form submit event
+        var form = document.getElementById("product-form");
+        form.addEventListener("submit", function (event) {
+            event.preventDefault(); // Prevent form from submitting
+
+            // Get values from form
+            var name = form.elements["name"].value;
+            var price = form.elements["price"].value;
+            var description = form.elements["description"].value;
+            var image = form.elements["image"].files[0];
+
+            // Create a new key for the product
+            var newKey = database.ref().child("homescreen").push().key;
+
+            // Upload image to Firebase Storage
+            var storageRef = storage.ref().child("images/" + newKey);
+            var uploadTask = storageRef.put(image);
+            uploadTask.on("state_changed", function (snapshot) {
+                // Track upload progress if desired
+            }, function (error) {
+                console.error("Error uploading image:", error);
+            }, function () {
+                // Get download URL of image and save product data to database
+                uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
+                    database.ref("homescreen/" + newKey).set({
+                        name: name,
+                        price: price,
+                        description: description,
+                        image: downloadURL
+                    }).then(function () {
+                        alert("Laptop added successfully!");
+                        form.reset();
+                    }).catch(function (error) {
+                        console.error("Error adding product to database:", error);
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+<footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <p>&copy; 2023 TechEmporium. All rights reserved.</p>
+        </div>
+        <div class="col-md-6">
+          <nav>
+            <ul class="list-unstyled">
+              <li><a href="#">Privacy Policy</a></li>
+              <li><a href="#">Terms of Use</a></li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <p>123 Main Street, Baroda,Gujarat,INDIA | Phone: (123) 456-7890 | Email: info@TechEmporium.com</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+</html>

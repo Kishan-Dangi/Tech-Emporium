@@ -1,0 +1,217 @@
+@import url("https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900");
+
+@import url('https://fonts.googleapis.com/css2?family=Dongle:wght@300;400;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  /* font-family: 'Dongle', sans-serif;
+ font-weight:900; */
+
+}
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* for logo================================= */
+
+/* .logo span{
+  
+    font-size: 40px;
+    font-weight: 700;
+    
+  } */
+
+
+
+.LOGO {
+  position: relative;
+}
+
+.LOGO h2 {
+  position: relative;
+  color: #fff;
+  font-size: 20px;
+
+  top: 5px;
+  left: 50px;
+}
+
+.LOGO span {
+  position: relative;
+  display: inline-block;
+  font-size: 20px;
+  font-weight: bold;
+  color: #12dbf1;
+  text-transform: uppercase;
+  animation: flip 2s infinite;
+  animation-delay: calc(.2s * var(--i))
+}
+
+@keyframes flip {
+
+  0%,
+  80% {
+    transform: rotateY(360deg)
+  }
+}
+
+
+
+
+
+/* logo ends here================================== */
+
+/* nav starts here ============================================================================================================ */
+nav {
+  overflow: hidden;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #000;
+  padding: 10px;
+  width: 100%;
+  height: 50px;
+  position: relative;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+
+
+.nav-links {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-links li {
+  list-style: none;
+  margin-right: 20px;
+  padding: 10px;
+
+}
+
+.nav-links li:hover {
+
+  background-color: #12dbf1;
+  border-radius: 9px;
+  color: #000;
+}
+
+.nav-links li a {
+  color: #fff;
+  text-decoration: none;
+
+
+}
+
+nav a.selected {
+  color: #25d9f9;
+
+
+}
+
+
+
+    body {
+
+      background: linear-gradient(90deg, #fbfcfc 0%, #d6dfe1 100%);
+      font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+
+    }
+
+    h1 {
+
+      top: 100px;
+      position: absolute;
+      left: 0;
+      padding: 10px;
+      border-top-right-radius: 30px;
+      border-bottom-right-radius: 30px;
+      background-color: #0ac8f3;
+      color: #000;
+      display: inline-block;
+      font-size: 20px;
+
+      font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    }
+
+
+    .products {
+      margin-top: 68px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      grid-gap: 20px;
+      padding: 10px;
+      background-color: rgb(255, 255, 255);
+
+    }
+
+    .product {
+      border: 1px solid #101010;
+      /* border-radius: 10px; */
+      padding: 20px;
+      margin: 10px;
+      text-align: center;
+      transition: all 5ms ease-in-out;
+
+    }
+
+    .product:hover {
+      transform: scale(1.1);
+
+
+      transition: all 0.1s ease-in-out 0.5s;
+    }
+
+
+    .product img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      margin-bottom: 10px;
+      z-index: -1;
+    }
+
+
+
+    .product h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .product p.description {
+      margin-top: 0;
+      margin-bottom: 10px;
+      height: 60px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      z-index: -1;
+    }
+
+    .product p.price {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    .product button {
+       
+      background-color: #333;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+     
+    }
+
+    .product button:hover {
+      background-color: #3e8e41;
+    }
+ 

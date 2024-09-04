@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment</title>
+    <style>
+        /* payment.css */
+        /* Apply general styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .payment-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        p {
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        img {
+            max-width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .continue-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .continue-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Order details */
+        .order-details {
+            margin-top: 30px;
+            border: 1px solid #ddd;
+            padding: 20px;
+            text-align: left;
+        }
+
+        .order-details p {
+            margin: 0;
+        }
+
+        .order-details strong {
+            font-weight: bold;
+        }
+
+        .order-details ul {
+            margin: 10px 0;
+            padding: 0;
+            list-style-type: none;
+        }
+
+        .order-details li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <h1>Make Payment</h1>
+        <div>
+            <ul id="items"></ul>
+            <p><strong>Total Amount:₹1000 </strong> <span id="total"></span></p>
+        </div>
+        <!-- Add Paytm payment instructions and code here -->
+        <img src="qr.jpg" alt="Paytm QR Code" width="300">
+        <p>Scan the QR code using the Paytm app and Pay ₹1000 for Confirming Your Order </p>
+        <p>After making the payment, click the button below to return to the homepage,After Successful Payment You will Receive Call From Tech-Emporium </p>
+        <a href="index.html" class="continue-button">Complete Payment</a>
+    </div>
+    <script>
+    var cartRef = dbRef.child("Cart");
+    cartRef.remove()
+        .then(function () {
+            alert("Thank you for your purchase!");
+            window.location.href = "index.html";
+        })
+        .catch(function (error) {
+            console.log("Error removing cart items:", error);
+        });
+
+    </script>
+</body>
+</html>

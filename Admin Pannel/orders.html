@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Order Details</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .product-item {
+            margin-bottom: 5px;
+            display: flex;
+        }
+
+        .product-name {
+            font-weight: bold;
+            flex: 1;
+        }
+
+        .product-price {
+            color: #888;
+            margin-left: 10px;
+        }
+
+        .product-quantity {
+            color: #888;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Order Details</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Contact</th>
+                <th>Address</th>
+                <th>Products</th>
+                <th>Total</th>
+                <th>Date/Time</th>
+                <!--  -->
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="order-items">
+        </tbody>
+    </table>
+
+    <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-database.js"></script>
+    <script>
+        // Initialize Firebase
+        var firebaseConfig = {
+            apiKey: "AIzaSyDrRU7QuBc0TFG_Ks5hNUgAMPAReps1giU",
+            authDomain: "tech-emporium.firebaseapp.com",
+            databaseURL: "https://tech-emporium-default-rtdb.firebaseio.com",
+            projectId: "tech-emporium",
+            storageBucket: "tech-emporium.appspot.com",
+            messagingSenderId: "567746946369",
+            appId: "1:567746946369:web:b3ae388079981d4422edc0",
+            measurementId: "G-YQNCSRVK9F"
+            // Your Firebase configuration
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        function displayOrders() {
+            var orderItems = document.getElementById("order-items");
+
+            firebase.database().ref("Orders").on("child_added", function (snap) {
+                var order = snap.val();
+                var row = document.createElement("tr");
+                var productsHtml = "";
+
+                // Create HTML for products
+                for (var i = 0; i < order.products.length; i++) {
+                    var product = order.products[i];
+                    var productHtml = '<div class="product-item">' +
+                        '<span class="product-name">' + product.name + '</span>' +
+                        '<span class="product-price">₹' + product.price + '</span>' +
+                        '<span class="product-quantity">x ' + product.quantity + '</span>' +
+                        '</div>';
+
+                    productsHtml += productHtml;
+                }
+
+                var timestamp = order.timestamp;
+                var date = new Date(timestamp);
+                var formattedDate = "Invalid Date";
+
+                if (!isNaN(date)) {
+                    formattedDate = date.toLocaleString();
+                }
+                // 
+                var deleteButtonHtml =
+                    '<button class="delete-button" data-order-id="' +
+                    snap.key +
+                    '">Delete</button>';
+                row.innerHTML = "<td>" + order.name + "</td>" +
+                    "<td>" + order.email + "</td>" +
+                    "<td>" + order.phone + "</td>" +
+                    "<td>" + order.address + "</td>" +
+                    "<td>" + productsHtml + "</td>" +
+                    "<td>₹" + order.total + "</td>" +
+                    "<td>" + formattedDate + "</td>" +
+                    "<td>" + deleteButtonHtml + "</td>";
+
+                var deleteButton = row.querySelector(".delete-button");
+                deleteButton.addEventListener("click", function () {
+                    var orderId = this.getAttribute("data-order-id");
+                    deleteOrder(orderId);
+                });
+
+                function deleteOrder(orderId) {
+    var row = document.querySelector('[data-order-id="' + orderId + '"]').parentNode;
+    firebase.database().ref("Orders/" + orderId).remove()
+        .then(function () {
+            console.log("Order successfully deleted!");
+
+            // Remove the row from the table
+            row.parentNode.removeChild(row);
+
+            // Display an alert to prompt a page reload
+            alert("Order deleted successfully.");
+            location.reload();
+        })
+        .catch(function (error) {
+            console.error("Error removing order: ", error);
+        });
+}
+
+                // 
+                orderItems.appendChild(row);
+            });
+        }
+
+
+        // Call the function to display orders
+        displayOrders();
+
+    </script>
+
+</body>
+
+</html>

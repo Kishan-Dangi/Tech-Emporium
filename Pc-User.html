@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>PC</title>
+  <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-database.js"></script>
+  <link rel="stylesheet" href="Pc-User.css">
+  <style>
+    .cart img{
+      height: 35px;
+      width: 35px;
+      margin-right: 80px;
+    }
+  </style>
+  <nav>
+
+    <div class="LOGO">
+      <h2>Tech</h2>
+      <span style="--i:1">E</span>
+      <span style="--i:2">M</span>
+      <span style="--i:3">P</span>
+      <span style="--i:4">O</span>
+      <span style="--i:5">R</span>
+      <span style="--i:6">I</span>
+      <span style="--i:7">U</span>
+      <span style="--i:8">M</span>
+    </div>
+
+
+    <ul class="nav-links">
+      <li><a href="index.html" class="nav-link">Home</a></li>
+      <li><a href="Laptop-User.html" class="nav-link">Laptops</a>
+      <li><a href="Pc-User.html" class="nav-link">PC</a>
+        <li><a href="User-Custom.html" class="nav-link">Custom-PC</a>
+
+        <!-- changed  -->
+      <li><a href="about.html" class="nav-link">About Us</a></li>
+      <li><a href="contact.html" class="nav-link">Contact Us</a></li>
+    </ul>
+    <div class="cart">
+      <a href="cart.html"><img src="kindpng_4803687.png" alt="error loading"></a>
+     </div>
+  </nav>
+
+  <script>
+    // Firebase configuration
+    var firebaseConfig = {
+      apiKey: "AIzaSyDrRU7QuBc0TFG_Ks5hNUgAMPAReps1giU",
+      authDomain: "tech-emporium.firebaseapp.com",
+      databaseURL: "https://tech-emporium-default-rtdb.firebaseio.com",
+      projectId: "tech-emporium",
+      storageBucket: "tech-emporium.appspot.com",
+      messagingSenderId: "567746946369",
+      appId: "1:567746946369:web:b3ae388079981d4422edc0",
+      measurementId: "G-YQNCSRVK9F"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    // Get a reference to the database service
+    var database = firebase.database();
+
+    // Function to display the products
+    function displayProducts() {
+      // Get a reference to the products in the database
+      var productsRef = firebase.database().ref('PC');
+
+      // Attach a listener to the products reference
+      productsRef.on('value', function (snapshot) {
+        var products = snapshot.val();
+        var productsList = document.getElementById('products-list');
+        productsList.innerHTML = '';
+        for (var key in products) {
+          if (products.hasOwnProperty(key)) {
+            var product = products[key];
+            // Create the HTML for the product
+            var productHTML = '<div class="product">';
+            productHTML += '<img src="' + product.image + '" alt="' + product.name + '">';
+            productHTML += '<h3>' + product.name + '</h3>';
+            productHTML += '<p class="description">' + product.description + '</p>';
+            productHTML += '<p class="price">₹' + product.price + '</p>';
+            productHTML += '<button onclick="addToCart(\'' + key + '\')">Add to Cart</button>';
+            productHTML += '</div>';
+            // Append the product HTML to the products list
+            productsList.innerHTML += productHTML;
+          }
+        }
+      });
+    }
+
+    // Function to add a product to the cart
+    function addToCart(key) {
+  // Get a reference to the cart in the database
+  var cartRef = firebase.database().ref('Cart');
+
+  // Get a reference to the product in the database
+  var productRef = firebase.database().ref('PC/' + key);
+
+  // Attach a listener to the product reference
+  productRef.once('value', function (snapshot) {
+    var product = snapshot.val();
+
+    // Get a reference to the cart item in the database
+    var cartItemRef = cartRef.child(key);
+
+    // Attach a listener to the cart item reference
+    cartItemRef.once('value', function (snapshot) {
+      var cartItem = snapshot.val() || {};
+
+      // Update the cart item with the product details
+      cartItem.name = product.name;
+      cartItem.image = product.image;
+      cartItem.price = product.price;
+      cartItem.quantity = cartItem.quantity?cartItem.quantity + 1 : 1;
+
+      // Update the cart item in the database
+      cartItemRef.set(cartItem);
+
+      // Alert the user that the product was added to the cart
+      alert('Product added to cart!');
+    });
+  });
+}
+  </script>
+  
+
+</head>
+
+<body onload="displayProducts()">
+  <h1>New PC</h1>
+  <div class="products" id="products-list"></div>
+</body>
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <p>&copy; 2023 TechEmporium. All rights reserved.</p>
+      </div>
+      <div class="col-md-6">
+        <nav>
+          <ul class="list-unstyled">
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Use</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <p>123 Main Street, Baroda,Gujarat,INDIA | Phone: (123) 456-7890 | Email: info@TechEmporium.com</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</html>
